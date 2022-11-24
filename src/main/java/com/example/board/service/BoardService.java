@@ -4,10 +4,12 @@ import com.example.board.BoardApplication;
 import com.example.board.entity.Board;
 import com.example.board.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,4 +37,10 @@ public class BoardService {
         if(oboard.isPresent()) return  oboard.get();
         throw new Exception("글번호 오류");
     }
+
+    public List<Board> boardList() throws Exception{
+        return  boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+
 }

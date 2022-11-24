@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 @RestController
 public class BoardController {
@@ -83,4 +84,20 @@ public class BoardController {
             e.printStackTrace();
         }
     }
+
+    @GetMapping("/listboard")
+    public  ResponseEntity<List<Board>> allAccount(){
+        ResponseEntity<List<Board>> res =null;
+        List<Board> accs = null;
+        try {
+            accs=boardService.boardList();
+            System.out.println(accs);
+            res=new ResponseEntity<List<Board>>(accs, HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            res=new ResponseEntity<List<Board>>(accs, HttpStatus.BAD_REQUEST);
+        }
+        return  res;
+    }
+
 }
