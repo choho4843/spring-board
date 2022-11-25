@@ -143,4 +143,19 @@ public class BoardController {
         }
         return res;
     }
+
+    @PutMapping("/delete/{id}")
+    public ResponseEntity<Integer> delete(@PathVariable Integer id,
+                                         @RequestParam("password") String password){
+        ResponseEntity<Integer> res = null;
+        System.out.println(password);
+        try {
+            Integer msgno = boardService.deleteBoard(id, password);
+            res = new ResponseEntity<Integer>(msgno, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            res = new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
+        }
+        return res;
+    }
 }

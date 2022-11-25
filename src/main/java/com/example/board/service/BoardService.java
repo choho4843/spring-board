@@ -69,4 +69,13 @@ public class BoardService {
 
         return pages.getContent();
     }
+
+    public Integer deleteBoard(Integer id, String password) throws Exception {
+        Optional<Board> oboard = boardRepository.findById(id);
+        if (oboard.isEmpty()) return -1;
+        Board board = oboard.get();
+        if (board.getPassword().equals(password) == false) return -2;
+        boardRepository.deleteById(id);
+        return 0;
+    }
 }
