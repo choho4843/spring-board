@@ -3,7 +3,10 @@ package com.example.board.service;
 import com.example.board.BoardApplication;
 import com.example.board.entity.Board;
 import com.example.board.repository.BoardRepository;
+import com.example.board.vo.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,30 +20,53 @@ public class BoardService {
     @Autowired
     BoardRepository boardRepository;
 
-    public void writeBoard(Board board) throws Exception{
+    public void writeBoard(Board board) throws Exception {
         boardRepository.save(board);
     }
-//    public void writeBoard2(Board board) throws  Exception{
-//        MultipartFile file = board.getFile();
-//        String filename=null;
-//        if(file!=null &&!file.isEmpty()){
-//            String path = "C:/kg/";
-//            filename = file.getOriginalFilename();
-//            File dFile = new File(path+filename);
-//            file.transferTo(dFile);
-//            board.setFilename(filename);
-//        }
-//        boardRepository.save(board);
-//    }
-    public Board detailBoard(Integer id) throws Exception{
+
+    public void writeBoard2(Board board, MultipartFile file) throws Exception {
+        String filename = null;
+        if (file != null && !file.isEmpty()) {
+            String path = "C:/kg/";
+            filename = file.getOriginalFilename();
+            File dFile = new File(path + filename);
+            file.transferTo(dFile);
+            board.setFilename(filename);
+        }
+        boardRepository.save(board);
+    }
+
+    public Board detailBoard(Integer id) throws Exception {
         Optional<Board> oboard = boardRepository.findById(id);
-        if(oboard.isPresent()) return  oboard.get();
+        if (oboard.isPresent()) return oboard.get();
         throw new Exception("글번호 오류");
     }
 
-    public List<Board> boardList() throws Exception{
-        return  boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    public List<Board> boardList() throws Exception {
+        return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
+    public void updateBoard(Integer id, String subject, String content) throws Exception {
+        Optional<Board> oboard = boardRepository.findById(id);
+        if (oboard.isEmpty()) throw new Exception("글 조회 오류");
+        Board board = oboard.get();
+        board.setSubject(subject);
+        board.setContent(content);
+        boardRepository.save(board);
+    }
 
+    public List<Board> boardPage(PageInfo pageInfo) throws Exception {
+        PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage() - 1, 5, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Board> pages = boardRepository.findAll(pageRequest);
+        int maxPage = pages.getTotalPages();
+        int startPage = pageInfo.getCurPage() / 10 * 10 + 1;
+        int endPage = startPage + 10 - 1;
+        if (endPage > maxPage) endPage = maxPage;
+
+        pageInfo.setAllPage(maxPage);
+        pageInfo.setStartPage(startPage);
+        pageInfo.setEndPage(endPage);
+
+        return pages.getContent();
+    }
 }

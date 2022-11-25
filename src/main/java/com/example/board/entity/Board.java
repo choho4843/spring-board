@@ -25,6 +25,5 @@ public class Board {
     private String content;
     @Column
     private String filename;
-    @Embedded
-    private MultipartFile file;
+
 }
